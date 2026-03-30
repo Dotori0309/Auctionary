@@ -1,0 +1,57 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+    session:
+      timeout: 30m
+      cookie:
+        name: JSESSIONID
+        http-only: true
+        secure: false
+        path: /
+        max-age: 1800
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  mvc:
+    view:
+      prefix: /views/
+      suffix: .jsp
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.0.64:3306/auctionary?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: tester
+    password: 1234
+
+mybatis:
+  type-aliases-package: edu.sm.dto
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: info
+    edu.sm: debug  # SQL 로그 확인용
+
+app:
+  dir:
+    imgsdir: file:///C:/Code/sm25spring/20250710    # 화면 출력 용
+    uploadimgsdir: C:/Code/sm25spring/20250710    # 파일 Write 용
+
+
+
+
+
+
+
+
+
+
+
+

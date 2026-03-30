@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.sm.repository.ProductRepository">
+
+    <resultMap id="ProductMap" type="edu.sm.dto.Product">
+        <id     property="productId"        column="product_id"/>
+        <result property="productName"      column="product_name"/>
+        <result property="imagePath"        column="image_path"/>
+        <result property="transactionStatus" column="transaction_status"/>
+        <result property="auctionEndDate"   column="auction_end_date"/>
+        <result property="registerUserId"   column="user_id"/>
+    </resultMap>
+
+    <!-- 문자열 ID 리스트로 조회 (DTO는 String) -->
+    <select id="findByIds" parameterType="java.util.List" resultMap="ProductMap">
+        SELECT
+        product_id,
+        product_name,
+        image_path,
+        transaction_status,
+        auction_end_date,
+        user_id
+        FROM Product
+        WHERE product_id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- ✅ productMapper.xml 내용 병합 -->
+    <insert id="insertProduct" parameterType="edu.sm.dto.Product">
+        INSERT INTO product (
+            user_id, product_name, description, image_path, category_id,
+            auction_start_date, auction_end_date,
+            starting_price, bid_unit, transaction_status
+        ) VALUES (
+                     #{registerUserId}, #{productName}, #{description}, #{imagePath}, #{categoryId},
+                     #{auctionStartDate}, #{auctionEndDate},
+                     #{startingPrice}, #{bidUnit}, #{transactionStatus}
+                 )
+    </insert>
+
+    <select id="selectAll" resultType="edu.sm.dto.Product">
+        SELECT
+            p.product_id, p.user_id, u.name AS register_user_name, p.product_name, p.description, p.image_path,
+            p.category_id, p.auction_start_date, p.auction_end_date,
+            p.starting_price, p.bid_unit, p.transaction_status,
+            (
+                SELECT MAX(bid_price)
+                FROM bid
+                WHERE product_id = p.product_id
+            ) AS highest_bid
+        FROM product p
+        JOIN user u ON p.user_id = u.user_id
+    </select>
+
+    <select id="select" parameterType="int" resultType="edu.sm.dto.Product">
+        SELECT
+            p.product_id, p.user_id, u.name AS register_user_name, p.product_name, p.description, p.image_path,
+            p.category_id, p.auction_start_date, p.auction_end_date,
+            p.starting_price, p.bid_unit, p.transaction_status,
+            (
+                SELECT MAX(bid_price)
+                FROM bid
+                WHERE product_id = p.product_id
+            ) AS highest_bid
+        FROM product p
+        JOIN user u ON p.user_id = u.user_id
+        WHERE p.product_id = #{productId}
+    </select>
+</mapper>
